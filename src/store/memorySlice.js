@@ -10,6 +10,7 @@ const initialState = {
   isGameWon: false,
   timeLeft: 60,
   timerRunning: false,
+  gameOver: false,
 };
 
 const memorySlice = createSlice({
@@ -24,6 +25,7 @@ const memorySlice = createSlice({
       state.isGameWon = false;
       state.timeLeft = 60;
       state.timerRunning = true;
+      state.gameOver = false;
     },
     flipCard(state, action) {
       const id = action.payload;
@@ -62,15 +64,20 @@ const memorySlice = createSlice({
     tick(state) {
       if (state.timerRunning && state.timeLeft > 0) {
         state.timeLeft -= 1;
-      } else {
+      } else if (state.timerRunning && state.timeLeft === 0) {
         state.timerRunning = false;
+        state.gameOver = true;
       }
     },
     nextLevel(state) {
       state.level += 1;
     },
     resetGame() {
-      return initialState;
+      return {
+        ...initialState,
+        cards: generateCardSet(1),
+        timerRunning: true,
+      };
     },
   },
 });
@@ -83,4 +90,5 @@ export const {
   resetGame,
   tick,
 } = memorySlice.actions;
+
 export default memorySlice.reducer;
